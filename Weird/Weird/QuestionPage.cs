@@ -22,7 +22,7 @@ namespace Weird
         public QuestionPage(IWeirdDatabase database)
         {
 
-            this.Padding = new Thickness(10, Device.OnPlatform(20, 0, 0), 10, 5);
+           // this.Padding = new Thickness(10, Device.OnPlatform(20, 0, 0), 10, 5);
 
             _testSm = new QuestionSessionManager(database);
             _question = _testSm.GetNewQuestion();
@@ -75,7 +75,7 @@ namespace Weird
             button.Clicked += OnButtonClicked;
 
             _relativeLayout.Children.Add(button, Constraint.RelativeToParent((parent) => {
-                return (parent.Width * 5);
+                return (parent.Width / 2) - (button.Width / 2);
             }),
              Constraint.RelativeToParent((parent) => {
                  return parent.Height -50;
@@ -103,7 +103,7 @@ namespace Weird
  
         }
 
-        private static void AddButtons(StackLayout stackLayout, List<Answer> questionAnswers)
+        private  void AddButtons(StackLayout stackLayout, List<Answer> questionAnswers)
         {
             foreach (var questionAnswer in questionAnswers)
             {
@@ -113,18 +113,54 @@ namespace Weird
                     AutomationId = questionAnswer.Id.ToString()
 
                 };
-                
 
+                button2.Clicked += OnSelectAnswerButtonClicked;
                 stackLayout.Children.Add(button2);
             }
          
 
         }
 
+
+        private Button _lastSelectedButton = null;
+        private string _selectedId = "";
+        void OnSelectAnswerButtonClicked(object sender, EventArgs e)
+        {
+            Button someButton = sender as Button;
+          
+
+            if (someButton != null)
+            {
+               // someButton.BorderColor= Color.Blue;
+                someButton.BackgroundColor = Color.Aqua;
+                _selectedId = someButton.AutomationId;
+                if (_lastSelectedButton != null)
+                {
+                   // _lastSelectedButton.BorderColor = default(Color);
+                    _lastSelectedButton.BackgroundColor = default(Color);
+                }
+
+                _lastSelectedButton = someButton;
+            }
+
+        }
+
         void OnButtonClicked(object sender, EventArgs e)
         {
-            var questionAnswer = _testSm.CheckAnswer(_question.Id, 2);
-            _contentView.Content = new Label {Text = questionAnswer.Explanation};
+
+            int selectItemId = int.Parse(_selectedId);
+
+            var questionAnswer = _testSm.CheckAnswer(_question.Id, selectItemId);
+            var contentViewContent = new Label
+            {
+                Text = questionAnswer.Explanation,
+                BackgroundColor = questionAnswer.IsCorrect ? Color.Green : Color.Red
+            };
+
+
+
+
+            _contentView.Content = contentViewContent;
 
             var parentContainer = (RelativeLayout) Content;
           
