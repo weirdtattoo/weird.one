@@ -67,18 +67,29 @@ namespace Weird
                      Text = "Check",
                      Font = Font.SystemFontOfSize(NamedSize.Large),
                      BorderWidth = 1,
-                     HorizontalOptions = LayoutOptions.Center,
-                     VerticalOptions = LayoutOptions.CenterAndExpand
+                     HorizontalOptions = LayoutOptions.FillAndExpand,
+                     VerticalOptions = LayoutOptions.CenterAndExpand,
+                    
+                    
                  };
             button.Clicked += OnButtonClicked;
 
             _relativeLayout.Children.Add(button, Constraint.RelativeToParent((parent) => {
-                return 0;
-            }));
+                return (parent.Width * 5);
+            }),
+             Constraint.RelativeToParent((parent) => {
+                 return parent.Height -50;
+             }));
 
             _relativeLayout.Children.Add(stackLayout, Constraint.RelativeToView(header, (parent, sibling) => {
-                return sibling.Height + 120;
-            }));
+                return 10;
+            }),
+             Constraint.RelativeToView(header, (parent, sibling) => {
+                 return sibling.Height + 30;
+             })
+
+
+            );
 
             //https://forums.xamarin.com/discussion/17742/relativelayout-in-xaml
 
