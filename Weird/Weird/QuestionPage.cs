@@ -14,10 +14,17 @@ namespace Weird
         
         int clickTotal = 0;
         private readonly QuestionSessionManager _testSm;
-        private readonly Question _question;
+        private Question _question;
     
-        private ContentView _contentView;
-        private RelativeLayout _relativeLayout;
+        private readonly ContentView _contentView;
+
+        private Button _lastSelectedButton = null;
+        private string _selectedId = "";
+        private readonly Label _contentViewContent;
+        private readonly Button _button;
+        private readonly Label _header;
+        private StackLayout _stackLayout;
+
 
         public QuestionPage(IWeirdDatabase database)
         {
@@ -25,22 +32,24 @@ namespace Weird
            // this.Padding = new Thickness(10, Device.OnPlatform(20, 0, 0), 10, 5);
 
             _testSm = new QuestionSessionManager(database);
-            _question = _testSm.GetNewQuestion();
+       
 
 
-            Label header = new Label
+          _header = new Label
             {
-                Text = _question.Text,
+              
                 Font = Font.BoldSystemFontOfSize(50),
                 HorizontalOptions = LayoutOptions.Center
             };
 
 
+           
+
           
 
-            _relativeLayout = new RelativeLayout();
+            var relativeLayout = new RelativeLayout();
 
-            _relativeLayout.Children.Add(header, Constraint.RelativeToParent((parent) =>
+            relativeLayout.Children.Add(_header, Constraint.RelativeToParent((parent) =>
             {
                 return 0;
             }));
@@ -49,19 +58,10 @@ namespace Weird
             _contentView  = new ContentView();
 
 
-            var stackLayout = new StackLayout();
+            _stackLayout = new StackLayout {Spacing = 10};
 
- 
-            AddButtons(stackLayout, _question.Answers);
-
-          
-
-            stackLayout.Spacing = 10;
-
-
-
-
-            Button button = new Button
+             
+            _button = new Button
             {
                   
                      Text = "Check",
@@ -72,24 +72,47 @@ namespace Weird
                     
                     
                  };
-            button.Clicked += OnButtonClicked;
+            _button.Clicked += OnButtonClicked;
 
-            _relativeLayout.Children.Add(button, Constraint.RelativeToParent((parent) => {
-                return (parent.Width / 2) - (button.Width / 2);
+            relativeLayout.Children.Add(_button, Constraint.RelativeToParent((parent) => {
+                return (parent.Width / 2) - (_button.Width / 2);
             }),
              Constraint.RelativeToParent((parent) => {
                  return parent.Height -50;
              }));
 
-            _relativeLayout.Children.Add(stackLayout, Constraint.RelativeToView(header, (parent, sibling) => {
+            relativeLayout.Children.Add(_stackLayout, Constraint.RelativeToView(_header, (parent, sibling) => {
                 return 10;
             }),
-             Constraint.RelativeToView(header, (parent, sibling) => {
+             Constraint.RelativeToView(_header, (parent, sibling) => {
                  return sibling.Height + 30;
              })
 
 
             );
+
+
+
+
+            _contentViewContent = new Label();
+          
+
+             
+            _contentView.Content = _contentViewContent;
+            _contentViewContent.IsVisible = false;
+
+            //var parentContainer = (RelativeLayout)Content;
+
+
+            relativeLayout.Children.Add(_contentView,
+              Constraint.RelativeToParent((parent) => {
+                  return parent.Width / 3;
+              }),
+              Constraint.RelativeToParent((parent) => {
+                  return parent.Height / 2;
+              }));
+
+
 
             //https://forums.xamarin.com/discussion/17742/relativelayout-in-xaml
 
@@ -97,10 +120,28 @@ namespace Weird
 
 
 
-            this.Content = _relativeLayout;
+            this.Content = relativeLayout;
+            LoadQuestion();
 
 
- 
+        }
+
+        private void LoadQuestion()
+        {
+            _question = _testSm.GetNewQuestion();
+            _header.Text = _question.Text;
+
+            if (_stackLayout.Children != null)
+            {
+                _stackLayout.Children.Clear();
+            }
+           
+
+
+            AddButtons(_stackLayout, _question.Answers);
+
+
+
         }
 
         private  void AddButtons(StackLayout stackLayout, List<Answer> questionAnswers)
@@ -122,8 +163,8 @@ namespace Weird
         }
 
 
-        private Button _lastSelectedButton = null;
-        private string _selectedId = "";
+   
+
         void OnSelectAnswerButtonClicked(object sender, EventArgs e)
         {
             Button someButton = sender as Button;
@@ -147,31 +188,28 @@ namespace Weird
 
         void OnButtonClicked(object sender, EventArgs e)
         {
-
-            int selectItemId = int.Parse(_selectedId);
-
-            var questionAnswer = _testSm.CheckAnswer(_question.Id, selectItemId);
-            var contentViewContent = new Label
+            if (_contentViewContent.IsVisible)
             {
-                Text = questionAnswer.Explanation,
-                BackgroundColor = questionAnswer.IsCorrect ? Color.Green : Color.Red
-            };
+                _contentViewContent.IsVisible = false;
+                LoadQuestion();
 
+                _contentViewContent.Text = "";
+                _contentViewContent.BackgroundColor =  default(Color);
+                _button.Text = "Check";
+            }
 
+            else
+            {
+                _contentViewContent.IsVisible = true;
 
+                int selectItemId = int.Parse(_selectedId);
+                var questionAnswer = _testSm.CheckAnswer(_question.Id, selectItemId);
 
-            _contentView.Content = contentViewContent;
-
-            var parentContainer = (RelativeLayout) Content;
-          
-
-            parentContainer.Children.Add(_contentView,
-              Constraint.RelativeToParent((parent) => {
-                  return parent.Width / 3;
-              }),
-              Constraint.RelativeToParent((parent) => {
-                  return parent.Height / 2;
-              }));
+                _contentViewContent.Text = questionAnswer.Explanation;
+                _contentViewContent.BackgroundColor = questionAnswer.IsCorrect ? Color.Green : Color.Red;
+               
+                _button.Text = "Continue";
+            }
 
 
 
