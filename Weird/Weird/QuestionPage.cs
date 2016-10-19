@@ -24,7 +24,7 @@ namespace Weird
         private readonly Button _button;
         private readonly Label _header;
         private StackLayout _stackLayout;
-
+        private bool _isLastQuestion =  false;
 
         public QuestionPage(IWeirdDatabase database)
         {
@@ -128,17 +128,28 @@ namespace Weird
 
         private void LoadQuestion()
         {
-            _question = _testSm.GetNewQuestion();
-            _header.Text = _question.Text;
-
-            if (_stackLayout.Children != null)
+            if (_isLastQuestion)
             {
-                _stackLayout.Children.Clear();
+                var summary = _testSm.GetSummary();
+                _button.IsVisible = false;
+                _stackLayout.IsVisible = false;
+                _header.Text = "Score " +summary.CorrectQuestions + "/" +
+                summary.TotalQuestions + " - " + summary.SummaryMessage;
+
+
             }
-           
+            else
+            {
+                _question = _testSm.GetNewQuestion();
+                _isLastQuestion = _question.IsLastQuestion;
+                _header.Text = _question.Text;
+
+                _stackLayout.Children?.Clear();
 
 
-            AddButtons(_stackLayout, _question.Answers);
+                AddButtons(_stackLayout, _question.Answers);
+            }
+            
 
 
 
