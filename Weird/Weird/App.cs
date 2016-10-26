@@ -72,6 +72,8 @@ namespace Weird
 
         public TestWeirdDatabase()
         {
+            _questions.Add(LoadQuestion("When James Fazy was a small boy, he ……… be bothered when about where to put this shoes when he came from school. He just threw them anywhere.", "2,It is a question", 1, "One plus one is two"));
+
             _questions.Add(LoadQuestion("What is 1+1?", "2,It is a question", 1, "One plus one is two"));
             _questions.Add(LoadQuestion("Hera was absorbed __ the movie", "at,with,in", 3,
                 "(often be absorbed in) take up the attention of(someone); interest greatly"));

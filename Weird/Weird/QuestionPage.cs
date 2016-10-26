@@ -25,7 +25,7 @@ namespace Weird
         private readonly Label _header;
         private StackLayout _stackLayout;
         private bool _isLastQuestion =  false;
-
+        internal static string FontFamily = Device.OnPlatform("MarkerFelt-Thin", "Droid Sans Mono", "Segoe UI");
         public QuestionPage(IWeirdDatabase database)
         {
 
@@ -37,10 +37,13 @@ namespace Weird
 
           _header = new Label
             {
-              
-                Font = Font.BoldSystemFontOfSize(50),
-                HorizontalOptions = LayoutOptions.Center
-            };
+
+              FontSize = Device.GetNamedSize(NamedSize.Large, typeof(Label)),
+              FontAttributes = FontAttributes.Bold,
+              HorizontalOptions = LayoutOptions.Center,
+              FontFamily = FontFamily,
+              Margin  = 5
+          };
 
 
            
@@ -48,6 +51,7 @@ namespace Weird
           
 
             var relativeLayout = new RelativeLayout();
+            relativeLayout.HorizontalOptions = LayoutOptions.FillAndExpand;
 
             relativeLayout.Children.Add(_header, Constraint.RelativeToParent((parent) =>
             {
@@ -58,7 +62,8 @@ namespace Weird
             _contentView  = new ContentView();
 
 
-            _stackLayout = new StackLayout {Spacing = 10};
+            _stackLayout = new StackLayout {Spacing = 10, HorizontalOptions = 
+                LayoutOptions.FillAndExpand };
 
              
             _button = new Button
@@ -67,26 +72,41 @@ namespace Weird
                      Text = "Check",
                      Font = Font.SystemFontOfSize(NamedSize.Large),
                      BorderWidth = 1,
-                     HorizontalOptions = LayoutOptions.FillAndExpand,
-                     VerticalOptions = LayoutOptions.CenterAndExpand,
-                    
-                    
-                 };
+               
+
+                //WidthRequest = 500
+
+
+            };
+           
             _button.Clicked += OnButtonClicked;
 
-            relativeLayout.Children.Add(_button, Constraint.RelativeToParent((parent) => {
-                return (parent.Width / 2) - (_button.Width / 2);
+            relativeLayout.Children.Add(_button, Constraint.RelativeToParent((parent) =>
+                {
+                    return 0;// (parent.Width / 2) - (_button.Width / 2);
             }),
              Constraint.RelativeToParent((parent) => {
                  return parent.Height -50;
-             }));
+             }),
+             Constraint.RelativeToParent((parent) => {
+                 return parent.Width ;
+             })
 
-            relativeLayout.Children.Add(_stackLayout, Constraint.RelativeToView(_header, (parent, sibling) => {
+
+             );
+
+            relativeLayout.Children.Add(
+                _stackLayout,
+                Constraint.RelativeToView(_header, (parent, sibling) => {
                 return 10;
             }),
              Constraint.RelativeToView(_header, (parent, sibling) => {
                  return sibling.Height + 30;
-             })
+             }),
+
+            Constraint.RelativeToParent((parent) => {
+                return parent.Width - 20;
+            })
 
 
             );
@@ -162,7 +182,8 @@ namespace Weird
                 var button2 = new Button
                 {
                     Text = questionAnswer.Text,
-                    AutomationId = questionAnswer.Id.ToString()
+                    AutomationId = questionAnswer.Id.ToString(),
+                    HorizontalOptions = LayoutOptions.FillAndExpand
 
                 };
 
@@ -228,88 +249,3 @@ namespace Weird
     }
 }
 
-
-//    public class QuestionPage : ContentPage
-//    {
-//        private readonly IWeirdDatabase _database;
-//        private readonly ListView _thoughtList;
-
-//        public QuestionPage(IWeirdDatabase database)
-//        {
-//            _database = database;
-//            Title = "Questions";
-//            var thoughts = _database.GetRandomQuestions(10);
-
-
-//            var testSm = new QuestionSessionManager(new TestWeirdDatabase());
-//            var question = testSm.GetNewQuestion();
-
-
-//            //    for (int i = 0; i < 10; i++)
-//            //    {
-//            //        Assert.IsTrue(i < 5);
-//            //        var question = testSm.GetNewQuestion();
-
-//            //        if (i == 0)
-//            //        {
-//            //            var questionAnswer = testSm.CheckAnswer(question.Id, 2);
-//            //            Assert.AreEqual(questionAnswer.IsCorrect, false);
-//            //            Assert.AreEqual(questionAnswer.Explanation, "One plus one is two");
-
-//            //        }
-
-
-//            //        if (i == 1)
-//            //        {
-//            //            var questionAnswer = testSm.CheckAnswer(question.Id, 2);
-//            //            Assert.AreEqual(questionAnswer.IsCorrect, false);
-//            //            Assert.AreEqual(questionAnswer.Explanation, "(often be absorbed in) take up the attention of(someone); interest greatly");
-
-//            //        }
-
-//            //        if (i == 2)
-//            //        {
-//            //            var questionAnswer = testSm.CheckAnswer(question.Id, 2);
-//            //            Assert.AreEqual(questionAnswer.IsCorrect, true);
-//            //            Assert.AreEqual(questionAnswer.Explanation, "Accuse of");
-
-//            //        }
-
-
-//            //        if (i == 3)
-//            //        {
-//            //            var questionAnswer = testSm.CheckAnswer(question.Id, 2);
-//            //            Assert.AreEqual(questionAnswer.IsCorrect, true);
-//            //            Assert.AreEqual(questionAnswer.Explanation, "“It’s” is only ever used when short for “it is”. “Its” indicates something belonging to something that isn’t masculine or feminine (like “his” and “hers”, but used when you’re not talking about a person).");
-
-//            //        }
-
-
-//            //        if (question.IsLastQuestion)
-//            //        {
-//            //            var questionSummary = testSm.GetSummary();
-//            //            Assert.AreEqual(questionSummary.TotalQuestions, 4);
-//            //            Assert.AreEqual(questionSummary.CorrectQuestions, 2);
-//            //            break;
-
-//            //        }
-//            //    }
-
-//            //}
-
-//            //_thoughtList = new ListView();
-//            //_thoughtList.ItemsSource = thoughts;
-//            //_thoughtList.ItemTemplate = new DataTemplate(typeof(TextCell));
-//            //_thoughtList.ItemTemplate.SetBinding(TextCell.TextProperty, "Id");
-//            //_thoughtList.ItemTemplate.SetBinding(TextCell.DetailProperty, "Text");
-
-
-//            //Content = _thoughtList;
-//        }
-
-//        public void Refresh()
-//        {
-//           // _thoughtList.ItemsSource = _database.GetRandomQuestions(10);
-//        }
-//    }
-//}
