@@ -144,12 +144,19 @@ namespace Weird
                     AutomationId = questionAnswer.Id.ToString(),
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     Font = Font.SystemFontOfSize(NamedSize.Large),
+                    BackgroundColor = Color.FromHex("#fff"),
+                    BorderColor = Color.FromHex("#ccc"),
+                    TextColor =  Color.FromHex("#373a3c"),
+                    BorderWidth = 1,
+
                 };
 
                 button2.Clicked += OnSelectAnswerButtonClicked;
                 stackLayout.Children.Add(button2);
             }
         }
+
+ 
 
 
         void OnSelectAnswerButtonClicked(object sender, EventArgs e)
@@ -164,12 +171,17 @@ namespace Weird
 
                 someButton.BackgroundColor = Color.FromHex("#1B82DB");
                 someButton.BorderColor = Color.FromHex("#0275d8");
+                someButton.TextColor = default(Color);
 
                 _selectedId = someButton.AutomationId;
                 if (_lastSelectedButton != null)
                 {
-                    // _lastSelectedButton.BorderColor = default(Color);
-                    _lastSelectedButton.BackgroundColor = default(Color);
+
+
+                    _lastSelectedButton.BackgroundColor = Color.FromHex("#fff");
+                    _lastSelectedButton.BorderColor = Color.FromHex("#ccc");
+                    _lastSelectedButton.TextColor = Color.FromHex("#373a3c");
+
                 }
 
                 _lastSelectedButton = someButton;
